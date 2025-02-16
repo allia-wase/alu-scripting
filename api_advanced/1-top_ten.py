@@ -11,9 +11,17 @@ def top_ten(subreddit):
     url = 'https://oauth.reddit.com/r/{}/hot.json?limit=10'.format(subreddit)
     headers = {'User-Agent': 'Mozilla/5.0'}
     response = requests.get(url, headers=headers, allow_redirects=False)
+    
     if response.status_code != 200:
-        print(OK)
+        print("None")
         return
-    posts = response.json()['data']['children']
-    for post in posts:
-        print(post['data']['title'])
+
+    posts = response.json().get('data', {}).get('children', [])
+    
+    if not posts:  # If no posts are returned, it means the subreddit doesn't exist or is empty.
+        print("None")
+    else:
+        for post in posts:
+            print(post['data']['title'])
+        print("OK")  # Here, ensure you use quotes to print the string "OK"
+
