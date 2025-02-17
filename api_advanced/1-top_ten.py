@@ -1,49 +1,27 @@
 #!/usr/bin/python3
 """
-Function that queries the Reddit API and prints the titles of the first 10 hot posts
-listed for a given subreddit or returns 'OK' for both existing and non-existent subreddits.
+Queries Reddit API & prints titles of first 10 hot posts for a subreddit.
+Returns 'OK' if subreddit doesn't exist.
 """
 
 import requests
 
-
 def top_ten(subreddit):
-    """
-    Prints the titles of the first 10 hot posts listed in a subreddit,
-    or returns 'OK' if the subreddit does not exist.
-    """
-    # Construct the URL for the subreddit's hot posts
-    url = "https://www.reddit.com/r/{}/hot.json?limit=10".format(subreddit)
-    headers = {"User-Agent": "Mozilla/5.0"}
-
+    url = f"https://www.reddit.com/r/{subreddit}/hot.json?limit=10"
+    headers = {"User-Agent": "CustomUserAgent"}
     try:
-        # Send a GET request to the Reddit API
-        response = requests.get(url, headers=headers, allow_redirects=False)
-
-        # Check the HTTP status code
-        if response.status_code == 200:
-            # Subreddit exists, extract and print the titles of the first 10 hot posts
-            posts = response.json().get("data", {}).get("children", [])
-            if posts:
-                for post in posts:
-                    print(post["data"]["title"])
-            else:
-                print("No posts found.")
-        elif response.status_code == 404:
-            # Subreddit does not exist, return 'OK' as per the requirement
+        res = requests.get(url, headers=headers, allow_redirects=False)
+        if res.status_code == 200:
+            data = res.json().get("data", {}).get("children", [])
+            for post in data:
+                print(post["data"]["title"])
+        elif res.status_code == 404:
             print("OK")
         else:
-            # Handle unexpected errors
             print("OK")
-    except Exception as e:
-        # Return 'OK' if an exception occurs
+    except Exception:
         print("OK")
 
-
-# Example usage
 if __name__ == "__main__":
-    # Test with an existing subreddit
-    top_ten("programming")
-
-    # Test with a non-existent subreddit
-    top_ten("thissubredditdoesnotexist123")
+    top_ten("programming")  # Test with existing subreddit
+    top_ten("nonexistent123")  # Test with non-existent subreddit
